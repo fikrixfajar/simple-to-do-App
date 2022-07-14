@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StatusBar } from "expo-status-bar";
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -14,23 +15,43 @@ import Task from "./components/Task";
 
 export default function App() {
     const [task, setTask] = useState();
+    const [taskItems, setTaskItems] = useState([]);
 
-    const handleTask = () => {
-      console.log(task);
+    const handleAddTask = () => {
+      Keyboard.dismiss();
+      setTaskItems([...taskItems, task])
+      setTask(null)
     }
 
-
+    // Menghapus task
+    const completeTask = (index) => {
+      let itemsCopy = [...taskItems];
+      itemsCopy.splice(index, 1);
+      setTaskItems(itemsCopy);
+    }
 
   return (
     <View style={styles.container}>
       {/* Today's Task*/}
       <View style={styles.taskWrapper}>
         <Text style={styles.sectionTitle}>Today's Task</Text>
+
         <View style={styles.items}>
           {/* This is the task will go */}
-          <Task text={"Task Pertama Bray"} />
+          {
+            taskItems.map((item, index) => {
+              return (
+                <TouchableOpacity key={index} onPress={() => completeTask(index)}>
+                    <Task  text ={item} />
+                </TouchableOpacity>
+              )
+              
+            })
+          }
+
+          {/* <Task text={"Task Pertama Bray"} />
           <Task text={"Ini Coba task kedua"} />
-          <Task text={"Mengerjakan skripsi"} />
+          <Task text={"Mengerjakan skripsi"} /> */}
         </View>
       </View>
 
@@ -39,8 +60,9 @@ export default function App() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.WriteTaskWrapper}
       >
-        <TextInput style={styles.input} placeholder={"Write a task"} value={task} onChangeText={text => setTask} />
-        <TouchableOpacity>
+        <TextInput style={styles.input} placeholder={"Write a task"} value={task} onChangeText={text => setTask (text)} />
+
+        <TouchableOpacity onPress={() => handleAddTask()} >
           <View style={styles.addWrapper}>
             <Text style={styles.addText}>+</Text>
           </View>
@@ -95,8 +117,9 @@ const styles = StyleSheet.create({
     borderWidth: 1
   },
   addText: {
-    fontSize: 35,
-    opacity:.5
-    // backgroundColor: 
+    fontSize: 40,
+    opacity:.4,
+    textAlign: "left",
+    bottom: 3
   },
 });
